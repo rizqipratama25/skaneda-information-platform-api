@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AgendaController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\EmailVerificationController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
@@ -27,3 +28,9 @@ Route::get('/roles', [RoleController::class, 'index'])->middleware(['auth:sanctu
 
 // Agenda
 Route::post('/agenda', [AgendaController::class, 'buatAgenda']);
+
+Route::post('/email/verification-notification', [EmailVerificationController::class, 'resend'])
+    ->middleware('throttle:6,1');
+
+Route::get('/email/verify', [EmailVerificationController::class, 'verify'])
+    ->middleware(['throttle:6,1', 'signed'])->name('verification.verify');
