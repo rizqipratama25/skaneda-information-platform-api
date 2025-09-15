@@ -60,18 +60,17 @@ class AuthController extends Controller
         $user = User::create([
             'username' => $request->username,
             'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role_id' => 2
+            'password' => Hash::make($request->password)
         ]);
 
-        // event(new Registered($user));
+        event(new Registered($user));
 
-        $token = $user->createToken('auth_token')->plainTextToken;
+        // $token = $user->createToken('auth_token')->plainTextToken;
 
-        return response()->json([
-            'data' => $user,
-            'access_token' => $token,
-            'token_type' => 'Bearer'
-        ]);
+        // return response()->json([
+        //     'data' => $user,
+        //     'access_token' => $token,
+        //     'token_type' => 'Bearer'
+        // ]);
     }
 }
