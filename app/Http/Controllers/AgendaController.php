@@ -25,9 +25,7 @@ class AgendaController extends Controller
 
         $agenda = Agenda::create([
             'name' => $request->name,
-            'dateTime' => $request->dateTime,
-            'made_by' => $request->user()->id,
-            'updated_by' => $request->user()->id
+            'dateTime' => $request->dateTime
         ]);
 
         return response()->json(['data' => $agenda]);
@@ -42,10 +40,7 @@ class AgendaController extends Controller
             'dateTime' => 'sometimes|date_format:Y-m-d H:i:s'
         ]);
 
-        $agenda->update(array_merge(
-            $validate,
-            ["updated_by" => $request->user()->id]
-        ));
+        $agenda->update( $validate);
 
         return response()->json([
             'message' => 'Berhasil update agenda',
@@ -53,14 +48,13 @@ class AgendaController extends Controller
         ]);
     }
 
-    public function deleteAgenda($id, Request $request)
+    public function deleteAgenda($id)
     {
         $agenda = Agenda::findOrFail($id);
         $agenda->delete(); // soft delete, tidak benar-benar hilang dari DB
 
         return response()->json([
-            'message' => 'Agenda berhasil dihapus',
-            'data' => $agenda
+            'message' => 'Agenda berhasil dihapus'
         ]);
     }
 }

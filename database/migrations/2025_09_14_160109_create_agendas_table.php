@@ -23,6 +23,12 @@ return new class extends Migration
             $table->foreign('made_by')->references('id')->on('users');
             $table->foreign('updated_by')->references('id')->on('users');
         });
+
+        Schema::table('agendas', function (Blueprint $table) {
+            $table->foreignId('created_by')->after('dateTime')->constrained('users')->restrictOnDelete();
+            $table->foreignId('updated_by')->after('created_by')->constrained('users')->restrictOnDelete();
+            $table->foreignId('deleted_by')->nullable()->after('updated_by')->constrained('users')->restrictOnDelete();
+        });
     }
 
     /**

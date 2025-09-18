@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EmailVerificationController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\UserStatusController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -26,15 +27,19 @@ Route::get('/users', [UserController::class, 'index'])->middleware(['auth:sanctu
 Route::post('/role', [RoleController::class, 'createRole']); //middleware
 Route::get('/roles', [RoleController::class, 'index']); //middleware
 
-// Agenda
-Route::post('/agenda', [AgendaController::class, 'buatAgenda']);
-
 Route::post('/email/verification-notification', [EmailVerificationController::class, 'resend'])
     ->middleware('throttle:6,1');
 
 Route::get('/email/verify', [EmailVerificationController::class, 'verify'])
     ->middleware(['throttle:6,1', 'signed'])->name('verification.verify');
+
+// Agenda
 Route::get('/agendas', [AgendaController::class, 'index']);
 Route::post('/agenda', [AgendaController::class, 'createAgenda'])->middleware(['auth:sanctum', 'can:admin']); //middleware
 Route::patch('/agenda/{id}', [AgendaController::class, 'updateAgenda'])->middleware(['auth:sanctum', 'can:admin']); //middleware
 Route::delete('/agenda/{id}', [AgendaController::class, 'deleteAgenda'])->middleware(['auth:sanctum', 'can:admin']); //middleware
+
+// User Status
+Route::post('/user-status', [UserStatusController::class, 'createUserStatus']);
+
+// Berita

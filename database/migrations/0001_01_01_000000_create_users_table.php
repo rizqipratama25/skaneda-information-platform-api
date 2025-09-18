@@ -37,6 +37,21 @@ return new class extends Migration
             $table->longText('payload');
             $table->integer('last_activity')->index();
         });
+
+        Schema::create('user_statuses', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->timestamps();
+        });
+
+        Schema::table('users', function (Blueprint $table) {
+            $table->foreignId('status_id')
+                ->after('password')
+                ->nullable()
+                ->constrained('user_statuses')
+                ->cascadeOnUpdate()
+                ->restrictOnDelete();
+        });
     }
 
     /**
@@ -47,5 +62,6 @@ return new class extends Migration
         Schema::dropIfExists('users');
         Schema::dropIfExists('password_reset_tokens');
         Schema::dropIfExists('sessions');
+        Schema::dropIfExists('user_statuses');
     }
 };
