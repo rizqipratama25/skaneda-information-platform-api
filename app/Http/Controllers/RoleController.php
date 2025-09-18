@@ -14,7 +14,7 @@ class RoleController extends Controller
         return response()->json(['data' => $users]);
     }
 
-    public function ubahRole($id, Request $request) {
+    public function updateUserRole($id, Request $request) {
         Validator::make($request->all(), [
             'role_id' => 'required|integer'
         ],
@@ -30,7 +30,7 @@ class RoleController extends Controller
         return response()->json(['data' => $role]);
     }
 
-    public function tambahRole(Request $request) {
+    public function createRole(Request $request) {
         Validator::make($request->all(), [
             'name' => 'required|string'
         ],[

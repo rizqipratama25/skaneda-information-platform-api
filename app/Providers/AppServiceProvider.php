@@ -23,7 +23,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Gate::define('admin', function (User $user) {
-            return $user->role_id == 3;
+            return $user->role_id == 1;
         });
 
         URL::forceRootUrl(config('app.url'));

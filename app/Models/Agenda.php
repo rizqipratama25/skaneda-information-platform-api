@@ -8,6 +8,8 @@ class Agenda extends Model
 {
     protected $fillable = [
         'name',
-        'dateTime'
+        'dateTime',
+        'made_by',
+        'updated_by'
     ];
 }
