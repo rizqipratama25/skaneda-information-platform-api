@@ -2,24 +2,27 @@
 
 namespace App\Mail;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Mail\Mailable;
-use Illuminate\Queue\SerializesModels;
 use App\Models\User;
+use Illuminate\Mail\Mailable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 
-class VerifyEmailLink extends Mailable
+class VerifyEmailLink extends Mailable implements ShouldQueue
 {
-    use Queueable, SerializesModels;
+    public int $tries = 3;
+    public int $timeout = 10;
 
-    public function __construct(public User $user, public string $verifyUrl) {}
+    public function __construct(
+        public User $user,
+        public string $verifyUrl
+    ) {}
 
     public function build()
     {
-        return $this->subject('Verify your email')
-                    ->view('emails.verify-email')
-                    ->with([
-                        'user'      => $this->user,
-                        'verifyUrl' => $this->verifyUrl,
-                    ]);
+        return $this->subject('Verifikasi Email Anda')
+            ->view('emails.verify-email')
+            ->with([
+                'user'      => $this->user,
+                'verifyUrl' => $this->verifyUrl,
+            ]);
     }
 }

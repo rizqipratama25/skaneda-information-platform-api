@@ -1,11 +1,12 @@
 <?php
 
 use App\Http\Controllers\AgendaController;
+use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\EmailVerificationController;
+use App\Http\Controllers\EmailVerificationController;;
+
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\UserStatusController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -27,6 +28,10 @@ Route::get('/users', [UserController::class, 'index'])->middleware(['auth:sanctu
 Route::post('/role', [RoleController::class, 'createRole']); //middleware
 Route::get('/roles', [RoleController::class, 'index']); //middleware
 
+Route::get('/email/verify', [EmailVerificationController::class, 'verify'])
+    ->middleware(['signed', 'throttle:6,1'])
+    ->name('api.verification.verify');
+
 Route::post('/email/verification-notification', [EmailVerificationController::class, 'resend'])
     ->middleware('throttle:6,1');
 
@@ -42,4 +47,8 @@ Route::delete('/agenda/{id}', [AgendaController::class, 'deleteAgenda'])->middle
 // User Status
 Route::post('/user-status', [UserStatusController::class, 'createUserStatus']);
 
-// Berita
+// Forgot/Reset Password
+Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLink'])
+    ->middleware('throttle:5,1');
+Route::post('/reset-password', [PasswordResetController::class, 'reset'])
+    ->middleware('throttle:5,1');
