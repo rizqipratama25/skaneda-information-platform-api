@@ -36,8 +36,15 @@ Route::get('/email/verify', [EmailVerificationController::class, 'verify'])
     ->middleware(['signed', 'throttle:6,1'])
     ->name('api.verification.verify');
 
+Route::get('/email/verify', [EmailVerificationController::class, 'verify'])
+    ->middleware(['signed', 'throttle:6,1'])
+    ->name('api.verification.verify');
+
 Route::post('/email/verification-notification', [EmailVerificationController::class, 'resend'])
     ->middleware('throttle:6,1');
 
-Route::get('/email/verify', [EmailVerificationController::class, 'verify'])
-    ->middleware(['throttle:6,1', 'signed'])->name('verification.verify');
+Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLink'])
+    ->middleware('throttle:5,1');
+
+Route::post('/reset-password', [PasswordResetController::class, 'reset'])
+    ->middleware('throttle:5,1');
