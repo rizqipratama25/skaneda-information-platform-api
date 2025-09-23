@@ -32,23 +32,12 @@ Route::get('/email/verify', [EmailVerificationController::class, 'verify'])
     ->middleware(['signed', 'throttle:6,1'])
     ->name('api.verification.verify');
 
+Route::get('/email/verify', [EmailVerificationController::class, 'verify'])
+    ->middleware(['signed', 'throttle:6,1'])
+    ->name('api.verification.verify');
+
 Route::post('/email/verification-notification', [EmailVerificationController::class, 'resend'])
     ->middleware('throttle:6,1');
 
 Route::get('/email/verify', [EmailVerificationController::class, 'verify'])
     ->middleware(['throttle:6,1', 'signed'])->name('verification.verify');
-
-// Agenda
-Route::get('/agendas', [AgendaController::class, 'index']);
-Route::post('/agenda', [AgendaController::class, 'createAgenda'])->middleware(['auth:sanctum', 'can:admin']); //middleware
-Route::patch('/agenda/{id}', [AgendaController::class, 'updateAgenda'])->middleware(['auth:sanctum', 'can:admin']); //middleware
-Route::delete('/agenda/{id}', [AgendaController::class, 'deleteAgenda'])->middleware(['auth:sanctum', 'can:admin']); //middleware
-
-// User Status
-Route::post('/user-status', [UserStatusController::class, 'createUserStatus']);
-
-// Forgot/Reset Password
-Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLink'])
-    ->middleware('throttle:5,1');
-Route::post('/reset-password', [PasswordResetController::class, 'reset'])
-    ->middleware('throttle:5,1');
