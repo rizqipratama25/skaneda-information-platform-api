@@ -31,7 +31,7 @@ class AgendaController extends Controller
         return response()->json(['data' => $agenda]);
     }
 
-    public function updateAgenda($id, Request $request)
+    public function updateAgenda(Request $request, $id)
     {
         $agenda = Agenda::findOrFail($id);
 

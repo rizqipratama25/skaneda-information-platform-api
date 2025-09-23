@@ -8,6 +8,7 @@ use App\Http\Controllers\EmailVerificationController;
 use App\Http\Controllers\FacilityController;
 use App\Http\Controllers\FacilityImageController;
 use App\Http\Controllers\NewsController;
+
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\StatusController;
 use App\Http\Controllers\UserController;
@@ -34,29 +35,35 @@ Route::get('/roles', [RoleController::class, 'index']); //middleware
 Route::patch('/role/{id}', [RoleController::class, 'updateRole']); //middleware
 Route::delete('/role/{id}', [RoleController::class, 'deleteRole']); //middleware
 
+Route::get('/email/verify', [EmailVerificationController::class, 'verify'])
+    ->middleware(['signed', 'throttle:6,1'])
+    ->name('api.verification.verify');
+
+Route::get('/email/verify', [EmailVerificationController::class, 'verify'])
+    ->middleware(['signed', 'throttle:6,1'])
+    ->name('api.verification.verify');
+
+Route::get('/email/verify', [EmailVerificationController::class, 'verify'])
+    ->middleware(['signed', 'throttle:6,1'])
+    ->name('api.verification.verify');
+
 // Email
-Route::get('/email/verify', [EmailVerificationController::class, 'verify'])
-    ->middleware(['signed', 'throttle:6,1'])
-    ->name('api.verification.verify');
-
-Route::get('/email/verify', [EmailVerificationController::class, 'verify'])
-    ->middleware(['signed', 'throttle:6,1'])
-    ->name('api.verification.verify');
-
-Route::get('/email/verify', [EmailVerificationController::class, 'verify'])
-    ->middleware(['signed', 'throttle:6,1'])
-    ->name('api.verification.verify');
-
 Route::post('/email/verification-notification', [EmailVerificationController::class, 'resend'])
     ->middleware('throttle:6,1');
 
 Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLink'])
     ->middleware('throttle:5,1');
 
+Route::post('/reset-password', [PasswordResetController::class, 'reset'])
+    ->middleware('throttle:5,1');
+
+Route::get('/email/verify', [EmailVerificationController::class, 'verify'])
+    ->middleware(['throttle:6,1', 'signed'])->name('verification.verify');
+
 // Agenda
 Route::get('/agendas', [AgendaController::class, 'index']);
 Route::post('/agenda', [AgendaController::class, 'createAgenda'])->middleware(['auth:sanctum', 'can:admin']); //middleware
-Route::patch('/agenda/{id}', [AgendaController::class, 'updateAgenda'])->middleware(['auth:sanctum', 'can:admin']); //middleware
+Route::patch('/agenda/{id}', [AgendaController::class, 'updateAgenda'])->middleware(['auth:sanctum', 'can:admin']);
 Route::delete('/agenda/{id}', [AgendaController::class, 'deleteAgenda'])->middleware(['auth:sanctum', 'can:admin']); //middleware
 
 // Status
@@ -87,5 +94,3 @@ Route::get('/facility-images', [FacilityImageController::class, 'index']);
 Route::post('/facility-images', [FacilityImageController::class, 'store']);
 Route::put('/facility-images/{id}', [FacilityImageController::class, 'update']);
 Route::delete('/facility-images/{id}', [FacilityImageController::class, 'destroy']);
-Route::post('/reset-password', [PasswordResetController::class, 'reset'])
-    ->middleware('throttle:5,1');
