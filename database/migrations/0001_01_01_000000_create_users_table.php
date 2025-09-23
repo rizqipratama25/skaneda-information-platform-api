@@ -38,9 +38,9 @@ return new class extends Migration
             $table->integer('last_activity')->index();
         });
 
-        Schema::create('user_statuses', function (Blueprint $table) {
+        Schema::create('statuses', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->string('status');
             $table->timestamps();
         });
 
@@ -48,7 +48,7 @@ return new class extends Migration
             $table->foreignId('status_id')
                 ->after('password')
                 ->nullable()
-                ->constrained('user_statuses')
+                ->constrained('statuses')
                 ->cascadeOnUpdate()
                 ->restrictOnDelete();
         });

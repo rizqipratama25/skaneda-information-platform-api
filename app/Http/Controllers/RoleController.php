@@ -15,12 +15,8 @@ class RoleController extends Controller
     }
 
     public function updateUserRole($id, Request $request) {
-        Validator::make($request->all(), [
+        $request->validate( [
             'role_id' => 'required|integer'
-        ],
-        [
-            'role_id.required' => 'Harap isi role',
-            'role_id.integer' => 'role_id harus berupa angka'
         ]);
 
         $role = User::findOrFail($id);
@@ -31,15 +27,36 @@ class RoleController extends Controller
     }
 
     public function createRole(Request $request) {
-        Validator::make($request->all(), [
+        $request->validate([
             'name' => 'required|string'
-        ],[
-            'name.required' => 'Nama role harus diisi',
-            'name.string' => 'Nama role harus berupa string',
         ]);
 
         $role = Role::create($request->all());
 
         return response()->json(['data' => $role]);
+    }
+
+    public function updateRole($id, Request $request) {
+        $role = Role::findOrFail($id);
+
+        $validate = $request->validate([
+            'name' => 'required|string'
+        ]);
+
+        $role->update( $validate);
+
+        return response()->json([
+            'message' => 'Berhasil update role',
+            'data' => $role
+        ]);
+    }
+
+    public function deleteRole($id) {
+        $role = Role::findOrFail($id);
+        $role->delete(); // soft delete, tidak benar-benar hilang dari DB
+
+        return response()->json([
+            'message' => 'Role berhasil dihapus'
+        ]);
     }
 }

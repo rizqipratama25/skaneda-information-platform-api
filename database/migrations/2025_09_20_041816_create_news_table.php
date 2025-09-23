@@ -11,10 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('agendas', function (Blueprint $table) {
+        Schema::create('news', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->dateTime('dateTime');
+            $table->string('title');
+            $table->string('slug')->unique();
+            $table->longText('contents');
+            $table->longText('image');
             $table->foreignId('created_by')->constrained('users')->restrictOnDelete();
             $table->foreignId('updated_by')->constrained('users')->restrictOnDelete();
             $table->foreignId('deleted_by')->nullable()->constrained('users')->restrictOnDelete();
@@ -28,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('agendas');
+        Schema::dropIfExists('news');
     }
 };

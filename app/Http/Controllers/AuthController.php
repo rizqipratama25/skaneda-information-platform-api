@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Mail\VerifyEmailLink;
 use App\Models\Role;
+use App\Models\Status;
 use App\Models\User;
-use App\Models\UserStatus;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -53,7 +53,7 @@ class AuthController extends Controller
         $defaultRoleId = Role::firstOrCreate(['name' => 'user'])->id;
 
         // Ambil default status = "Pending" kalau tidak ada input
-        $defaultStatusId = UserStatus::firstOrCreate(['name' => 'Pending'])->id;
+        $defaultStatusId = Status::firstOrCreate(['status' => 'Pending'])->id;
 
         // Buat user baru
         $user = User::create([

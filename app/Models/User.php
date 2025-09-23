@@ -46,7 +46,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function status(): BelongsTo
     {
-        return $this->belongsTo(UserStatus::class, 'status_id');
+        return $this->belongsTo(Status::class, 'status_id');
     }
     
     public function scopeActive($query)
