@@ -8,7 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Auth\Notifications\ResetPassword as ResetPasswordNotification;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -48,13 +48,28 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->belongsTo(Status::class, 'status_id');
     }
-    
+
     public function scopeActive($query)
     {
         return $query->whereHas('status', fn($q) => $q->where('name', 'Active'));
     }
 
-    public function agenda(): HasMany {
-        return $this->hasMany(Agenda::class);
+
+    public function sendPasswordResetNotification($token): void
+    {
+        $frontend = rtrim(config('app.frontend_url', env('APP_FRONTEND_URL', 'http://localhost:3000')), '/');
+        $url = $frontend . "/reset-password?token={$token}&email={$this->email}";
+
+        $this->notify(new class($url) extends ResetPasswordNotification {
+            public function __construct(public string $resetUrl) {}
+            public function toMail($notifiable)
+            {
+                return (new \Illuminate\Notifications\Messages\MailMessage)
+                    ->subject('Reset Password')
+                    ->line('Klik tombol di bawah untuk mereset password Anda.')
+                    ->action('Reset Password', $this->resetUrl)
+                    ->line('Jika Anda tidak meminta reset, abaikan email ini.');
+            }
+        });
     }
 }

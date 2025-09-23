@@ -3,9 +3,12 @@
 namespace App\Http\Requests\Auth;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class RegisterRequest extends FormRequest
 {
+    protected $stopOnFirstFailure = true;
     public function authorize(): bool
     {
         return true;
@@ -33,5 +36,19 @@ class RegisterRequest extends FormRequest
             'password.required' => 'Password harus diisi',
             'password.min'      => 'Password minimal 8 karakter',
         ];
+    }
+
+    protected function failedValidation(Validator $validator)
+    {
+        throw new HttpResponseException(
+            response()->json(['errors' => $validator->errors()], 422)
+        );
+    }
+
+    protected function failedAuthorization()
+    {
+        throw new HttpResponseException(
+            response()->json(['message' => 'Forbidden'], 403)
+        );
     }
 }

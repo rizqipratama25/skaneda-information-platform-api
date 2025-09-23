@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AchievementController;
 use App\Http\Controllers\AgendaController;
+use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EmailVerificationController;
 use App\Http\Controllers\FacilityController;
@@ -10,7 +11,6 @@ use App\Http\Controllers\NewsController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\StatusController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\UserStatusController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -35,11 +35,23 @@ Route::patch('/role/{id}', [RoleController::class, 'updateRole']); //middleware
 Route::delete('/role/{id}', [RoleController::class, 'deleteRole']); //middleware
 
 // Email
+Route::get('/email/verify', [EmailVerificationController::class, 'verify'])
+    ->middleware(['signed', 'throttle:6,1'])
+    ->name('api.verification.verify');
+
+Route::get('/email/verify', [EmailVerificationController::class, 'verify'])
+    ->middleware(['signed', 'throttle:6,1'])
+    ->name('api.verification.verify');
+
+Route::get('/email/verify', [EmailVerificationController::class, 'verify'])
+    ->middleware(['signed', 'throttle:6,1'])
+    ->name('api.verification.verify');
+
 Route::post('/email/verification-notification', [EmailVerificationController::class, 'resend'])
     ->middleware('throttle:6,1');
 
-Route::get('/email/verify', [EmailVerificationController::class, 'verify'])
-    ->middleware(['throttle:6,1', 'signed'])->name('verification.verify');
+Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLink'])
+    ->middleware('throttle:5,1');
 
 // Agenda
 Route::get('/agendas', [AgendaController::class, 'index']);
@@ -75,3 +87,5 @@ Route::get('/facility-images', [FacilityImageController::class, 'index']);
 Route::post('/facility-images', [FacilityImageController::class, 'store']);
 Route::put('/facility-images/{id}', [FacilityImageController::class, 'update']);
 Route::delete('/facility-images/{id}', [FacilityImageController::class, 'destroy']);
+Route::post('/reset-password', [PasswordResetController::class, 'reset'])
+    ->middleware('throttle:5,1');
