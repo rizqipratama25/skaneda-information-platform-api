@@ -76,7 +76,7 @@ class AuthController extends Controller
 
         // Buat signed URL
         $verificationUrl = URL::temporarySignedRoute(
-            'api.verification.verify',    // pastikan ini nama route di routes/api.php
+            'api.verification.verify',
             now()->addMinutes(60),
             ['id' => $user->id, 'hash' => sha1($user->getEmailForVerification())]
         );
@@ -94,12 +94,9 @@ class AuthController extends Controller
         });
 
         // Token API
-        $token = $user->createToken('auth_token')->plainTextToken;
+        // $token = $user->createToken('auth_token')->plainTextToken;
         return response()->json([
             'message'      => 'Registrasi berhasil, silakan cek email untuk verifikasi.',
-            'user'         => $user,
-            'access_token' => $token,
-            'token_type'   => 'Bearer',
         ], 201);
     }
 }

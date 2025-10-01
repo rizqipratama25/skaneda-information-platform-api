@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use \Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Auth\Notifications\ResetPassword as ResetPasswordNotification;
 
 class User extends Authenticatable implements MustVerifyEmail
@@ -64,7 +65,7 @@ class User extends Authenticatable implements MustVerifyEmail
             public function __construct(public string $resetUrl) {}
             public function toMail($notifiable)
             {
-                return (new \Illuminate\Notifications\Messages\MailMessage)
+                return (new MailMessage)
                     ->subject('Reset Password')
                     ->line('Klik tombol di bawah untuk mereset password Anda.')
                     ->action('Reset Password', $this->resetUrl)
