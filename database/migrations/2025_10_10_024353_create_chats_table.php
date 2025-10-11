@@ -11,11 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('extracurriculars', function (Blueprint $table) {
+        Schema::create('chats', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('image');
-            $table->foreignId('status_id')->constrained('statuses')->restrictOnDelete();
+            $table->string('chat');
+            $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('forum_id')->constrained('forums')->cascadeOnDelete();
+            $table->foreignId('status_id')->constrained('statuses')->cascadeOnDelete();
             $table->timestamps();
         });
     }
@@ -25,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('extracurriculars');
+        Schema::dropIfExists('chats');
     }
 };

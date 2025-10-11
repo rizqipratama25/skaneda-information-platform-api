@@ -55,42 +55,26 @@ class FacilityImageController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $post = FacilityImage::findOrFail($id);
-
-        $validator = Validator::make($request->all(), [
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048'
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation Error',
-                'errors' => $validator->errors()
-            ], 422);
+        $image = FacilityImage::findOrFail($id);
+        $image->delete();
+        
+        if (FacilityImage::where('facility_id', $request->facility_id)->count() == 3) {
+            return response()->json(['message' => 'The maximum number of images allowed is 3'], 400);
         }
 
-        // Update fields lain
-        $post->fill($request->only(['title', 'content']));
-
-        // Handle image update
-        if ($request->hasFile('image')) {
-            // Hapus image lama jika ada
-            if ($post->image && Storage::disk('public')->exists($post->image)) {
-                Storage::disk('public')->delete($post->image);
-            }
-
-            // Upload image baru
-            $imagePath = $request->file('image')->store('facility_images', 'public');
-            $post->image = $imagePath;
-        }
-
-        $post->save();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Post updated successfully',
-            'data' => $post
+        $request->validate([
+            'image' => 'required|image|mimes:jpg,jpeg,png|max:2048',
+            'facility_id' => 'required|integer'
         ]);
+
+        $path = $request->file('image')->store('facility_images', 'public');
+
+        $facilityImage = FacilityImage::create([
+            'image' => $path,
+            'facility_id' => $request->facility_id
+        ]);
+
+        return response()->json($facilityImage, 201);
     }
 
     /**
@@ -98,6 +82,11 @@ class FacilityImageController extends Controller
      */
     public function destroy($id)
     {
-        
+        $image = FacilityImage::findOrFail($id);
+        $image->delete(); 
+
+        return response()->json([
+            'message' => 'Gambar Fasilitas berhasil dihapus'
+        ]);
     }
 }

@@ -2,17 +2,19 @@
 
 use App\Http\Controllers\AchievementController;
 use App\Http\Controllers\AgendaController;
+use App\Http\Controllers\ChatController;
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EmailVerificationController;
+use App\Http\Controllers\ExtracurricularController;
 use App\Http\Controllers\FacilityController;
 use App\Http\Controllers\FacilityImageController;
+use App\Http\Controllers\ForumController;
 use App\Http\Controllers\NewsController;
 
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\StatusController;
 use App\Http\Controllers\UserController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 
@@ -82,5 +84,17 @@ Route::delete('/facilities/{id}', [FacilityController::class, 'destroy']);
 // Gambar Fasilitas
 Route::get('/facility-images', [FacilityImageController::class, 'index']);
 Route::post('/facility-images', [FacilityImageController::class, 'store']);
-Route::put('/facility-images/{id}', [FacilityImageController::class, 'update']);
-Route::delete('/facility-images/{id}', [FacilityImageController::class, 'destroy']);
+Route::post('/facility-images/{id}', [FacilityImageController::class, 'update']);
+
+// Extrakulikuler
+Route::get('/extracurricular', [ExtracurricularController::class, 'index']);
+Route::post('/extracurricular', [ExtracurricularController::class, 'store']);
+Route::post('/extracurricular/{id}', [ExtracurricularController::class, 'update']);
+Route::delete('/extracurricular/{id}', [ExtracurricularController::class, 'destroy']);
+
+// Forum
+Route::apiResource('/forums', ForumController::class); // middleware
+
+// Chat
+Route::get('/chats', [ChatController::class, 'index']);
+Route::post('/chats', [ChatController::class, 'store']);

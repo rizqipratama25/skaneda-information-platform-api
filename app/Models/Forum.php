@@ -4,13 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Extracurricular extends Model
+class Forum extends Model
 {
     protected $fillable = [
-        'name',
-        'image',
+        'forum_name',
+        'description',
         'status_id'
     ];
 

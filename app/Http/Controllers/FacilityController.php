@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Facility;
 use App\Models\Status;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class FacilityController extends Controller
 {
@@ -13,7 +14,7 @@ class FacilityController extends Controller
      */
     public function index()
     {
-        $facilities = Facility::with('images')->get();
+        $facilities = Facility::with(['images'])->get();
         return response()->json($facilities);
     }
 
@@ -63,10 +64,22 @@ class FacilityController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Facility $facility)
+    public function destroy($id)
     {
-        $facility->delete();
+        $facility = Facility::findOrFail($id);
+        $facility = Facility::with('images')->findOrFail($id);
+    
+        // Hapus semua gambar dari storage lokal
+        foreach ($facility->images as $image) {
+            if ($image->image) {
+                Storage::disk('public')->delete($image->image);
+            }
+        }
 
-        return response()->json(["message" => "Delete successfully"], 204);
+        $facility->delete(); 
+
+        return response()->json([
+            'message' => 'Data berhasil dihapus'
+        ]);
     }
 }

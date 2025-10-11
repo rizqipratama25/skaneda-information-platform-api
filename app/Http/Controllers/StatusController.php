@@ -18,7 +18,7 @@ class StatusController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'status' => 'required|string|max:255',
         ]);
 
         $userStatus = Status::create($validated);
@@ -31,10 +31,12 @@ class StatusController extends Controller
         return response()->json($userStatus);
     }
 
-    public function update(Request $request, Status $userStatus)
+    public function update(Request $request, $id)
     {
+        $userStatus = Status::findOrFail($id);
+
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'status' => 'required|string|max:255',
         ]);
 
         $userStatus->update($validated);
@@ -42,8 +44,9 @@ class StatusController extends Controller
         return response()->json($userStatus);
     }
 
-    public function destroy(Status $userStatus)
+    public function destroy($id)
     {
+        $userStatus = Status::findOrFail($id);
         $userStatus->delete();
 
         return response()->json(["message" => "Delete successfully"], 204);

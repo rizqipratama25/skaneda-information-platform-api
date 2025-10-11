@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('extracurriculars', function (Blueprint $table) {
+        Schema::create('forums', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('image');
-            $table->foreignId('status_id')->constrained('statuses')->restrictOnDelete();
+            $table->string('forum_name');
+            $table->string('description');
+            $table->foreignId('status_id')->constrained('statuses')->cascadeOnDelete();
             $table->timestamps();
         });
     }
@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('extracurriculars');
+        Schema::dropIfExists('forums');
     }
 };

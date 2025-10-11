@@ -1,3 +1,4 @@
+
 <?php
 
 use Illuminate\Database\Migrations\Migration;
@@ -14,14 +15,14 @@ return new class extends Migration
         Schema::create('facilities', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->foreignId('status_id')->constrained('statuses')->restrictOnDelete();
+            $table->foreignId('status_id')->constrained('statuses')->cascadeOnDelete();
             $table->timestamps();
         });
 
         Schema::create('facility_images', function (Blueprint $table) {
             $table->id();
             $table->string('image');
-            $table->foreignId('facility_id')->constrained('facilities')->restrictOnDelete();
+            $table->foreignId('facility_id')->constrained('facilities')->cascadeOnDelete();
             $table->timestamps();
         });
     }
