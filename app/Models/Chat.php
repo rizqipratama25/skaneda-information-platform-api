@@ -15,6 +15,18 @@ class Chat extends Model
         'status_id'
     ];
 
+    public static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($data) {
+            if (Auth::check()) {
+                $data->user_id = Auth::id();
+            }
+        });
+
+    }
+
     public function user(): BelongsTo {
         return $this->belongsTo(User::class);
     }
@@ -27,16 +39,5 @@ class Chat extends Model
         return $this->belongsTo(Forum::class);
     }
 
-    public static function boot()
-    {
-        parent::boot();
-
-        static::creating(function ($data) {
-            if (Auth::check()) {
-                $data->user_id = Auth::id();
-                $data->status_id = Status::firstOrCreate(['status' => 'Pending'])->id;
-            }
-        });
-
-    }
+    
 }

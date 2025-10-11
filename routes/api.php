@@ -3,6 +3,7 @@
 use App\Http\Controllers\AchievementController;
 use App\Http\Controllers\AgendaController;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\JobListingController;
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EmailVerificationController;
@@ -10,6 +11,7 @@ use App\Http\Controllers\ExtracurricularController;
 use App\Http\Controllers\FacilityController;
 use App\Http\Controllers\FacilityImageController;
 use App\Http\Controllers\ForumController;
+use App\Http\Controllers\JobTypeController;
 use App\Http\Controllers\NewsController;
 
 use App\Http\Controllers\RoleController;
@@ -97,4 +99,18 @@ Route::apiResource('/forums', ForumController::class); // middleware
 
 // Chat
 Route::get('/chats', [ChatController::class, 'index']);
-Route::post('/chats', [ChatController::class, 'store']);
+Route::post('/chats', [ChatController::class, 'store'])->middleware(['auth:sanctum']); //middleware
+Route::patch('/chats/{id}', [ChatController::class, 'update']);
+Route::delete('/chats/{id}', [ChatController::class, 'destroy']);
+
+// Job Listing
+Route::get('/joblisting', [JobListingController::class, 'index']);
+Route::post('/joblisting', [JobListingController::class, 'store']); //middleware
+Route::patch('/joblisting/{id}', [JobListingController::class, 'update']);
+Route::delete('/joblisting/{id}', [JobListingController::class, 'destroy']);
+
+// Job Type
+Route::get('/jobtype', [JobTypeController::class, 'index']);
+Route::post('/jobtype', [JobTypeController::class, 'store']); //middleware
+Route::patch('/jobtype/{id}', [JobTypeController::class, 'update']);
+Route::delete('/jobtype/{id}', [JobTypeController::class, 'destroy']);

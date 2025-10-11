@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Chat;
+use App\Models\Status;
 use Illuminate\Http\Request;
 
 class ChatController extends Controller
@@ -15,6 +16,8 @@ class ChatController extends Controller
 
     public function store(Request $request)
     {
+        $defaultStatusId = Status::firstOrCreate(['status' => 'Pending'])->id;
+
         $request->validate([
             'chat' => 'required|string',
             'forum_id' => 'required|integer',
@@ -23,7 +26,8 @@ class ChatController extends Controller
 
         $data = Chat::create([
             'chat' => $request->chat,
-            'forum_id' => $request->forum_id
+            'forum_id' => $request->forum_id,
+            'status_id' => $request->status_id ?? $defaultStatusId
         ]);
 
         return response()->json(['data' => $data]);
@@ -35,7 +39,8 @@ class ChatController extends Controller
 
         $validate = $request->validate([
             'chat' => 'sometimes|string',
-            'forum_id' => 'sometimes|integer'
+            'forum_id' => 'sometimes|integer',
+            'status_id' => 'sometimes|integer'
         ]);
 
         $data->update( $validate);
