@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\ForumDetailResource;
+use App\Http\Resources\ForumResource;
 use App\Models\Forum;
 use App\Models\Status;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class ForumController extends Controller
 {
@@ -13,8 +16,26 @@ class ForumController extends Controller
      */
     public function index()
     {
-        $facilities = Forum::with(['status'])->get();
-        return response()->json($facilities);
+        $data = Cache::remember('forums', 300, function () {
+            $forum = Forum::whereHas('status', function ($query) {
+                $query->where('status', 'Active');
+            })->get();
+
+            return ForumResource::collection($forum)->resolve();
+        });
+
+        return response()->json($data);
+    }
+
+    public function indexAdmin()
+    {
+        $data = Cache::remember('forums-admin', 300, function () {
+            $forum = Forum::all();
+
+            return ForumResource::collection($forum)->resolve();
+        });
+
+        return response()->json($data);
     }
 
     /**
@@ -22,6 +43,8 @@ class ForumController extends Controller
      */
     public function store(Request $request)
     {
+        Cache::forget('forums');
+        Cache::forget('forums-admin');
         $defaultStatusId = Status::firstOrCreate(['status' => 'Active'])->id;
 
         $request->validate([
@@ -45,7 +68,7 @@ class ForumController extends Controller
     public function show(string $id)
     {
         $data = Forum::findOrFail($id);
-        return response()->json($data);
+        return response()->json(new ForumDetailResource($data));
     }
 
     /**
@@ -53,6 +76,8 @@ class ForumController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        Cache::forget('forum');
+        Cache::forget('forum-admin');
         $data = Forum::findOrFail($id);
 
         $validate = $request->validate([
@@ -61,11 +86,11 @@ class ForumController extends Controller
             'status_id' => 'sometimes|integer',
         ]);
 
-        $data->update( $validate);
+        $data->update($validate);
 
         return response()->json([
             'message' => 'Berhasil update Forum',
-            'data' => $data
+            'data' => new ForumResource($data)
         ]);
     }
 
@@ -74,6 +99,8 @@ class ForumController extends Controller
      */
     public function destroy(string $id)
     {
+        Cache::forget('forum');
+        Cache::forget('forum-admin');
         $data = Forum::findOrFail($id);
         $data->delete(); // soft delete, tidak benar-benar hilang dari DB
 

@@ -56,9 +56,9 @@ Route::post('/reset-password', [PasswordResetController::class, 'reset'])
 
 // Agenda
 Route::get('/agendas', [AgendaController::class, 'index']);
-Route::post('/agenda', [AgendaController::class, 'createAgenda'])->middleware(['auth:sanctum', 'can:admin']); //middleware
+Route::post('/agenda', [AgendaController::class, 'createAgenda'])->middleware(['auth:sanctum', 'can:admin']);
 Route::patch('/agenda/{id}', [AgendaController::class, 'updateAgenda'])->middleware(['auth:sanctum', 'can:admin']);
-Route::delete('/agenda/{id}', [AgendaController::class, 'deleteAgenda'])->middleware(['auth:sanctum', 'can:admin']); //middleware
+Route::delete('/agenda/{id}', [AgendaController::class, 'deleteAgenda'])->middleware(['auth:sanctum', 'can:admin']);
 
 // Status
 Route::apiResource('/statuses', StatusController::class); // middleware
@@ -79,9 +79,10 @@ Route::delete('/achievements/{slug}', [AchievementController::class, 'destroy'])
 
 // Fasilitas
 Route::get('/facilities', [FacilityController::class, 'index']);
-Route::post('/facilities', [FacilityController::class, 'store']);
-Route::patch('/facilities/{id}', [FacilityController::class, 'update']);
-Route::delete('/facilities/{id}', [FacilityController::class, 'destroy']);
+Route::get('/facilities/admin', [FacilityController::class, 'indexAdmin'])->middleware(['auth:sanctum', 'can:admin']);
+Route::post('/facilities', [FacilityController::class, 'store'])->middleware(['auth:sanctum', 'can:admin']);
+Route::patch('/facilities/{id}', [FacilityController::class, 'update'])->middleware(['auth:sanctum', 'can:admin']);
+Route::delete('/facilities/{id}', [FacilityController::class, 'destroy'])->middleware(['auth:sanctum', 'can:admin']);
 
 // Gambar Fasilitas
 Route::get('/facility-images', [FacilityImageController::class, 'index']);
@@ -90,12 +91,18 @@ Route::post('/facility-images/{id}', [FacilityImageController::class, 'update'])
 
 // Extrakulikuler
 Route::get('/extracurricular', [ExtracurricularController::class, 'index']);
+Route::get('/extracurricular/admin', [ExtracurricularController::class, 'indexAdmin'])->middleware(['auth:sanctum', 'can:admin']);
 Route::post('/extracurricular', [ExtracurricularController::class, 'store']);
 Route::post('/extracurricular/{id}', [ExtracurricularController::class, 'update']);
 Route::delete('/extracurricular/{id}', [ExtracurricularController::class, 'destroy']);
 
 // Forum
-Route::apiResource('/forums', ForumController::class); // middleware
+Route::get('/forums', [ForumController::class, 'index']);
+Route::get('/forums/admin', [ForumController::class, 'indexAdmin'])->middleware(['auth:sanctum', 'can:admin']);
+Route::get('/forums/{id}', [ForumController::class, 'show']);
+Route::post('/forums', [ForumController::class, 'store']);
+Route::patch('/forums/{id}', [ForumController::class, 'update']);
+Route::delete('/forums/{id}', [ForumController::class, 'destroy']);
 
 // Chat
 Route::get('/chats', [ChatController::class, 'index']);

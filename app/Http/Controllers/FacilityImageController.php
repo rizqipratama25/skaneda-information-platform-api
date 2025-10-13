@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\FacilityImage;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
@@ -14,7 +15,11 @@ class FacilityImageController extends Controller
      */
     public function index()
     {
-        $data = FacilityImage::all();
+        $data = Cache::remember('facility-images', 300, function () {
+            $facility = FacilityImage::all();
+            return $facility;
+        });
+
         return response()->json($data);
     }
 
@@ -23,6 +28,7 @@ class FacilityImageController extends Controller
      */
     public function store(Request $request)
     {
+        Cache::forget('facility-images');
         if (FacilityImage::where('facility_id', $request->facility_id)->count() == 3) {
             return response()->json(['message' => 'The maximum number of images allowed is 3'], 400);
         }
@@ -82,6 +88,7 @@ class FacilityImageController extends Controller
      */
     public function destroy($id)
     {
+        Cache::forget('facility-images');
         $image = FacilityImage::findOrFail($id);
         $image->delete(); 
 

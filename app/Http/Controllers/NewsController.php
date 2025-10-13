@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\NewsResource;
 use App\Models\News;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -14,7 +16,12 @@ class NewsController extends Controller
      */
     public function index()
     {
-        return response()->json(News::all());
+        $data = Cache::remember('news', 300, function () {
+            $news = News::all();
+            return NewsResource::collection($news)->resolve();
+        });
+
+        return response()->json($data);
     }
 
     /**
@@ -22,6 +29,7 @@ class NewsController extends Controller
      */
     public function store(Request $request)
     {
+        Cache::forget('news');
         $request->validate([
             'title' => 'required|string|max:255',
             'contents' => 'required|string',
@@ -56,6 +64,7 @@ class NewsController extends Controller
      */
     public function update(Request $request, $slug)
     {
+        Cache::forget('news');
         $news = News::where('slug', $slug)->firstOrFail();
 
         $request->validate([
@@ -85,6 +94,7 @@ class NewsController extends Controller
      */
     public function destroy($slug)
     {
+        Cache::forget('news');
         $news = News::where('slug', $slug)->firstOrFail();
         $news->delete();
 

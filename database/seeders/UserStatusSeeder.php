@@ -10,7 +10,7 @@ class UserStatusSeeder extends Seeder
 {
     public function run(): void
     {
-        Status::firstOrCreate(['status' => 'active']);
-        Status::firstOrCreate(['status' => 'inactive']);
+        Status::firstOrCreate(['status' => 'Active']);
+        Status::firstOrCreate(['status' => 'Inactive']);
     }
 }

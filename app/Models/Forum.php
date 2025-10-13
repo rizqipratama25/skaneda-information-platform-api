@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Forum extends Model
 {
@@ -15,5 +16,9 @@ class Forum extends Model
 
     public function status(): BelongsTo {
         return $this->belongsTo(Status::class);
+    }
+
+    public function chats(): HasMany {
+        return $this->hasMany(Chat::class);
     }
 }

@@ -11,9 +11,8 @@ class Achievements extends Model
     use SoftDeletes;
     protected $fillable = [
         'title',
-        'slug',
-        'contents',
         'image',
+        'description',
         'created_by',
         'updated_by',
         'deleted_by'

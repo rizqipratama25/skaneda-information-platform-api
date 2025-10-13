@@ -11,12 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
+        Schema::create('achievement_categories', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->timestamps();
+        });
+
         Schema::create('achievements', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->string('slug')->unique();
-            $table->longText('contents');
-            $table->longText('image');
+            $table->string('image');
+            $table->string('description');
+            $table->foreignId('category_id')->constrained('achievement_categories')->restrictOnDelete();
             $table->foreignId('created_by')->constrained('users')->restrictOnDelete();
             $table->foreignId('updated_by')->constrained('users')->restrictOnDelete();
             $table->foreignId('deleted_by')->nullable()->constrained('users')->restrictOnDelete();

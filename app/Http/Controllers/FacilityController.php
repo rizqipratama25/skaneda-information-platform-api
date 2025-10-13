@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\FacilityResource;
 use App\Models\Facility;
 use App\Models\Status;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 
 class FacilityController extends Controller
@@ -14,8 +16,26 @@ class FacilityController extends Controller
      */
     public function index()
     {
-        $facilities = Facility::with(['images'])->get();
-        return response()->json($facilities);
+        $data = Cache::remember('facilities', 300, function () {
+            $facilities = Facility::whereHas('status', function ($query) {
+                $query->where('status', 'Active');
+            })->get();
+
+            return FacilityResource::collection($facilities)->resolve();
+        });
+
+        return response()->json($data);
+    }
+
+    public function indexAdmin()
+    {
+        $data = Cache::remember('facilities-admin', 300, function () {
+            $facilities = Facility::all();
+
+            return FacilityResource::collection($facilities)->resolve();
+        });
+
+        return response()->json($data);
     }
 
     /**
@@ -23,6 +43,8 @@ class FacilityController extends Controller
      */
     public function store(Request $request)
     {
+        Cache::forget('facilities');
+        Cache::forget('facilities-admin');
         $defaultStatusId = Status::firstOrCreate(['status' => 'Active'])->id;
 
         $facility = Facility::create([
@@ -66,9 +88,11 @@ class FacilityController extends Controller
      */
     public function destroy($id)
     {
+        Cache::forget('facilities');
+        Cache::forget('facilities-admin');
         $facility = Facility::findOrFail($id);
         $facility = Facility::with('images')->findOrFail($id);
-    
+
         // Hapus semua gambar dari storage lokal
         foreach ($facility->images as $image) {
             if ($image->image) {
@@ -76,7 +100,7 @@ class FacilityController extends Controller
             }
         }
 
-        $facility->delete(); 
+        $facility->delete();
 
         return response()->json([
             'message' => 'Data berhasil dihapus'
