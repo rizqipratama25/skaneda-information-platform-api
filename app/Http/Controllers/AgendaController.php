@@ -14,7 +14,7 @@ class AgendaController extends Controller
     public function index()
     {
         $data = Cache::remember('agenda', 300, function () {
-            $agendas = Agenda::all();
+            $agendas = Agenda::with(['createdBy', 'updatedBy', 'deletedBy'])->get();
             return AgendaResource::collection($agendas)->resolve();
         });
 
@@ -51,7 +51,7 @@ class AgendaController extends Controller
         $agenda->update($validate);
 
         return response()->json([
-            'message' => 'Berhasil update agenda',
+            'message' => 'Update agenda successfully',
             'data' => new AgendaResource($agenda)
         ]);
     }
@@ -63,7 +63,7 @@ class AgendaController extends Controller
         $agenda->delete(); // soft delete, tidak benar-benar hilang dari DB
 
         return response()->json([
-            'message' => 'Agenda berhasil dihapus'
+            'message' => 'Delete agenda successfully'
         ]);
     }
 }

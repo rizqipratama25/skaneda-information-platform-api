@@ -27,7 +27,6 @@ return new class extends Migration
             $table->string('location');
             $table->text('description');
             $table->string('registration_link');
-            $table->foreignId('status_id')->nullable()->constrained('statuses')->restrictOnDelete();
             $table->timestamps();
         });
     }

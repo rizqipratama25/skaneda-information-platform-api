@@ -10,10 +10,12 @@ use App\Http\Controllers\EmailVerificationController;
 use App\Http\Controllers\ExtracurricularController;
 use App\Http\Controllers\FacilityController;
 use App\Http\Controllers\FacilityImageController;
+use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\ForumController;
 use App\Http\Controllers\JobTypeController;
 use App\Http\Controllers\NewsController;
-
+use App\Http\Controllers\NewsViewController;
+use App\Http\Controllers\PartnerController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\StatusController;
 use App\Http\Controllers\UserController;
@@ -32,10 +34,10 @@ Route::patch('/user/{id}', [RoleController::class, 'updateUserRole'])->middlewar
 Route::get('/users', [UserController::class, 'index'])->middleware(['auth:sanctum', 'can:admin']);
 
 // Role
-Route::post('/role', [RoleController::class, 'createRole']); //middleware
-Route::get('/roles', [RoleController::class, 'index']); //middleware
-Route::patch('/role/{id}', [RoleController::class, 'updateRole']); //middleware
-Route::delete('/role/{id}', [RoleController::class, 'deleteRole']); //middleware
+Route::post('/role', [RoleController::class, 'createRole'])->middleware(['auth:sanctum', 'can:admin']);
+Route::get('/roles', [RoleController::class, 'index'])->middleware(['auth:sanctum', 'can:admin']);
+Route::patch('/role/{id}', [RoleController::class, 'updateRole'])->middleware(['auth:sanctum', 'can:admin']);
+Route::delete('/role/{id}', [RoleController::class, 'deleteRole'])->middleware(['auth:sanctum', 'can:admin']);
 
 Route::get('/email/verify', [EmailVerificationController::class, 'verify'])
     ->middleware(['signed', 'throttle:6,1'])
@@ -61,21 +63,20 @@ Route::patch('/agenda/{id}', [AgendaController::class, 'updateAgenda'])->middlew
 Route::delete('/agenda/{id}', [AgendaController::class, 'deleteAgenda'])->middleware(['auth:sanctum', 'can:admin']);
 
 // Status
-Route::apiResource('/statuses', StatusController::class); // middleware
+Route::apiResource('/statuses', StatusController::class)->middleware(['auth:sanctum', 'can:admin']); // middleware
 
 // Berita
 Route::get('/news', [NewsController::class, 'index']);
 Route::get('/news/{slug}', [NewsController::class, 'show']);
 Route::post('/news', [NewsController::class, 'store'])->middleware(['auth:sanctum', 'can:admin']);
-Route::patch('/news/{slug}', [NewsController::class, 'update'])->middleware(['auth:sanctum', 'can:admin']);
+Route::post('/news/{slug}', [NewsController::class, 'update'])->middleware(['auth:sanctum', 'can:admin']);
 Route::delete('/news/{slug}', [NewsController::class, 'destroy'])->middleware(['auth:sanctum', 'can:admin']);
 
 // Prestasi
 Route::get('/achievements', [AchievementController::class, 'index']);
-Route::get('/achievements/{slug}', [AchievementController::class, 'show']);
 Route::post('/achievements', [AchievementController::class, 'store'])->middleware(['auth:sanctum', 'can:admin']);
-Route::patch('/achievements/{slug}', [AchievementController::class, 'update'])->middleware(['auth:sanctum', 'can:admin']);
-Route::delete('/achievements/{slug}', [AchievementController::class, 'destroy'])->middleware(['auth:sanctum', 'can:admin']);
+Route::post('/achievements/{id}', [AchievementController::class, 'update'])->middleware(['auth:sanctum', 'can:admin']);
+Route::delete('/achievements/{id}', [AchievementController::class, 'destroy'])->middleware(['auth:sanctum', 'can:admin']);
 
 // Fasilitas
 Route::get('/facilities', [FacilityController::class, 'index']);
@@ -85,39 +86,49 @@ Route::patch('/facilities/{id}', [FacilityController::class, 'update'])->middlew
 Route::delete('/facilities/{id}', [FacilityController::class, 'destroy'])->middleware(['auth:sanctum', 'can:admin']);
 
 // Gambar Fasilitas
-Route::get('/facility-images', [FacilityImageController::class, 'index']);
 Route::post('/facility-images', [FacilityImageController::class, 'store']);
 Route::post('/facility-images/{id}', [FacilityImageController::class, 'update']);
 
 // Extrakulikuler
 Route::get('/extracurricular', [ExtracurricularController::class, 'index']);
 Route::get('/extracurricular/admin', [ExtracurricularController::class, 'indexAdmin'])->middleware(['auth:sanctum', 'can:admin']);
-Route::post('/extracurricular', [ExtracurricularController::class, 'store']);
-Route::post('/extracurricular/{id}', [ExtracurricularController::class, 'update']);
-Route::delete('/extracurricular/{id}', [ExtracurricularController::class, 'destroy']);
+Route::post('/extracurricular', [ExtracurricularController::class, 'store'])->middleware(['auth:sanctum', 'can:admin']);
+Route::post('/extracurricular/{id}', [ExtracurricularController::class, 'update'])->middleware(['auth:sanctum', 'can:admin']);
+Route::delete('/extracurricular/{id}', [ExtracurricularController::class, 'destroy'])->middleware(['auth:sanctum', 'can:admin']);
 
 // Forum
 Route::get('/forums', [ForumController::class, 'index']);
 Route::get('/forums/admin', [ForumController::class, 'indexAdmin'])->middleware(['auth:sanctum', 'can:admin']);
 Route::get('/forums/{id}', [ForumController::class, 'show']);
-Route::post('/forums', [ForumController::class, 'store']);
-Route::patch('/forums/{id}', [ForumController::class, 'update']);
-Route::delete('/forums/{id}', [ForumController::class, 'destroy']);
+Route::post('/forums', [ForumController::class, 'store'])->middleware(['auth:sanctum', 'can:admin']);
+Route::patch('/forums/{id}', [ForumController::class, 'update'])->middleware(['auth:sanctum', 'can:admin']);
+Route::delete('/forums/{id}', [ForumController::class, 'destroy'])->middleware(['auth:sanctum', 'can:admin']);
 
 // Chat
 Route::get('/chats', [ChatController::class, 'index']);
 Route::post('/chats', [ChatController::class, 'store'])->middleware(['auth:sanctum']); //middleware
-Route::patch('/chats/{id}', [ChatController::class, 'update']);
-Route::delete('/chats/{id}', [ChatController::class, 'destroy']);
+Route::patch('/chats/{id}', [ChatController::class, 'update'])->middleware(['auth:sanctum', 'can:admin']);
+Route::delete('/chats/{id}', [ChatController::class, 'destroy'])->middleware(['auth:sanctum', 'can:admin']);
 
 // Job Listing
 Route::get('/joblisting', [JobListingController::class, 'index']);
-Route::post('/joblisting', [JobListingController::class, 'store']); //middleware
-Route::patch('/joblisting/{id}', [JobListingController::class, 'update']);
-Route::delete('/joblisting/{id}', [JobListingController::class, 'destroy']);
+Route::post('/joblisting', [JobListingController::class, 'store'])->middleware(['auth:sanctum', 'can:admin']); //middleware
+Route::patch('/joblisting/{id}', [JobListingController::class, 'update'])->middleware(['auth:sanctum', 'can:admin']);
+Route::delete('/joblisting/{id}', [JobListingController::class, 'destroy'])->middleware(['auth:sanctum', 'can:admin']);
 
 // Job Type
 Route::get('/jobtype', [JobTypeController::class, 'index']);
-Route::post('/jobtype', [JobTypeController::class, 'store']); //middleware
-Route::patch('/jobtype/{id}', [JobTypeController::class, 'update']);
-Route::delete('/jobtype/{id}', [JobTypeController::class, 'destroy']);
+
+// Feedback
+Route::get('/feedback', [FeedbackController::class, 'index'])->middleware(['auth:sanctum', 'can:admin']);
+Route::post('/feedback', [FeedbackController::class, 'store']); //middleware
+Route::delete('/feedback/{id}', [FeedbackController::class, 'destroy'])->middleware(['auth:sanctum', 'can:admin']);
+
+// Partner
+Route::get('/partner', [PartnerController::class, 'index']);
+Route::post('/partner', [PartnerController::class, 'store'])->middleware(['auth:sanctum', 'can:admin']); //middleware
+Route::patch('/partner/{id}', [PartnerController::class, 'update'])->middleware(['auth:sanctum', 'can:admin']);
+Route::delete('/partner/{id}', [PartnerController::class, 'destroy'])->middleware(['auth:sanctum', 'can:admin']);
+
+// News View
+Route::post('/news/{news}/view', [NewsViewController::class, 'store']);

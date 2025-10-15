@@ -5,7 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class FacilityResource extends JsonResource
+class AchievementResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -16,11 +16,12 @@ class FacilityResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'name' => $this->name,
-            'status' => $this->status->status,
-            'images' => $this->images->map(function ($image) {
-                return ["id" => $image->id, "image" => $image->image];
-            })
+            'title' => $this->title,
+            'image' => $this->image,
+            'description' => $this->description,
+            'category' => $this->category->name,
+            'created_by' => $this->createdBy->username,
+            'deleted_by' => $this->deletedBy?->username
         ];
     }
 }

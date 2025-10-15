@@ -18,7 +18,7 @@ class ExtracurricularController extends Controller
     {
         $data = Cache::remember('extracurricular', 300, function () {
             $extra = Extracurricular::whereHas('status', function ($query) {
-                $query->where('status', 'Active');
+                $query->where('status', 'Active')->with('status');
             })->get();
 
             return ExtracurricularResource::collection($extra)->resolve();
@@ -30,7 +30,7 @@ class ExtracurricularController extends Controller
     public function indexAdmin()
     {
         $data = Cache::remember('extracurricular-admin', 300, function () {
-            $extra = Extracurricular::all();
+            $extra = Extracurricular::with('status')->get();
             return ExtracurricularResource::collection($extra)->resolve();
         });
 
@@ -59,7 +59,7 @@ class ExtracurricularController extends Controller
             'status_id' => $request->status_id ?? $defaultStatusId
         ]);
 
-        return response()->json($data, 201);
+        return response()->json(new ExtracurricularResource($data));
     }
 
     /**
@@ -75,25 +75,47 @@ class ExtracurricularController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $image = Extracurricular::findOrFail($id);
-        $image->delete();
+        $ext = Extracurricular::findOrFail($id);
 
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'image' => 'required|image|mimes:jpg,jpeg,png|max:2048',
+        // Validasi input
+        $validated = $request->validate([
+            'name' => 'sometimes|string|max:255',
+            'image' => 'sometimes|image|mimes:jpg,jpeg,png|max:2048',
+            'status_id' => 'sometimes|integer',
         ]);
 
-        $path = $request->file('image')->store('extracurricular_images', 'public');
+        $data = [];
 
-        $defaultStatusId = Status::firstOrCreate(['status' => 'Active'])->id;
+        if ($request->filled('name')) {
+            $data['name'] = $validated['name'];
+        }
 
-        $data = Extracurricular::create([
-            'name' => $request->name,
-            'image' => $path,
-            'status_id' => $request->status_id ?? $defaultStatusId
-        ]);
+        if ($request->filled('status_id')) {
+            $data['status_id'] = $validated['status_id'];
+        }
 
-        return response()->json($data, 201);
+        // Jika ada gambar baru (opsional)
+        if ($request->hasFile('image')) {
+            // Hapus gambar lama (kalau ada)
+            if (!empty($ext->image) && file_exists(public_path('extracurricular_images/' . $ext->image))) {
+                unlink(public_path('extracurricular_images/' . $ext->image));
+            }
+
+            // Simpan gambar baru
+            $path = $request->file('image')->store('extracurricular_images', 'public');
+
+            // Simpan path relatif ke kolom image
+            $data['image'] = $path;
+        }
+
+        // Update data di database
+        $ext->update($data);
+
+        // Kembalikan data terbaru
+        return response()->json([
+            'message' => 'Extracurricular updated successfully',
+            'data' => new ExtracurricularResource($ext),
+        ], 200);
     }
 
     /**
@@ -111,7 +133,7 @@ class ExtracurricularController extends Controller
         $extracurricular->delete(); 
 
         return response()->json([
-            'message' => 'Delete successfully'
+            'message' => 'Extracurricular deleted successfully'
         ]);
     }
 }

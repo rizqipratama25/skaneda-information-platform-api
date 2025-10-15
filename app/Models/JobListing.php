@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class JobListing extends Model
 {
@@ -10,10 +11,14 @@ class JobListing extends Model
         'name',
         'open_positions',
         'position',
-        'type',
+        'type_id',
         'location',
         'description',
         'registration_link',
         'status_id'
     ];
+
+    public function type(): BelongsTo {
+        return $this->belongsTo(JobType::class);
+    }
 }

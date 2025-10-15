@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\UserResource;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -23,7 +24,7 @@ class RoleController extends Controller
         $role->role_id = $request->role_id;
         $role->save();
 
-        return response()->json(['data' => $role]);
+        return response()->json(new UserResource($role));
     }
 
     public function createRole(Request $request) {
@@ -56,7 +57,7 @@ class RoleController extends Controller
         $role->delete(); // soft delete, tidak benar-benar hilang dari DB
 
         return response()->json([
-            'message' => 'Role berhasil dihapus'
+            'message' => 'Delete role successfully'
         ]);
     }
 }

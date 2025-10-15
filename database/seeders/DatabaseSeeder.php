@@ -24,5 +24,6 @@ class DatabaseSeeder extends Seeder
         $this->call(ChatsSeeder::class);
         $this->call(FacilitiesSeeder::class);
         $this->call(AchievementCategoriesSeeder::class);
+        $this->call(PartnerSeeder::class);
     }
 }

@@ -49,6 +49,6 @@ class StatusController extends Controller
         $userStatus = Status::findOrFail($id);
         $userStatus->delete();
 
-        return response()->json(["message" => "Delete successfully"], 204);
+        return response()->json(["message" => "Delete status successfully"]);
     }
 }

@@ -18,7 +18,7 @@ class FacilityController extends Controller
     {
         $data = Cache::remember('facilities', 300, function () {
             $facilities = Facility::whereHas('status', function ($query) {
-                $query->where('status', 'Active');
+                $query->where('status', 'Active')->with('status');
             })->get();
 
             return FacilityResource::collection($facilities)->resolve();
@@ -52,7 +52,7 @@ class FacilityController extends Controller
             'status_id' => $request->status_id ?? $defaultStatusId,
         ]);
 
-        return response()->json($facility, 201);
+        return response()->json(new FacilityResource($facility));
     }
 
     /**
@@ -78,8 +78,8 @@ class FacilityController extends Controller
         $facility->update($validate);
 
         return response()->json([
-            'message' => 'Berhasil update Facility',
-            'data' => $facility
+            'message' => 'Facility updated successfully',
+            'data' => new FacilityResource($facility)
         ]);
     }
 
@@ -103,7 +103,7 @@ class FacilityController extends Controller
         $facility->delete();
 
         return response()->json([
-            'message' => 'Data berhasil dihapus'
+            'message' => 'Facility deleted successfully'
         ]);
     }
 }

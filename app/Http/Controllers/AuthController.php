@@ -56,6 +56,8 @@ class AuthController extends Controller
 
     public function register(RegisterRequest $request)
     {
+        
+
         $defaultRoleId   = Role::where('name', 'user')->value('id')
             ?? Role::firstOrCreate(['name' => 'user'])->id;
 

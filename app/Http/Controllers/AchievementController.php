@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\AchievementResource;
+use App\Http\Resources\AgendaResource;
 use App\Models\Achievements;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class AchievementController extends Controller
@@ -13,7 +16,8 @@ class AchievementController extends Controller
      */
     public function index()
     {
-        return response()->json(Achievements::all());
+        $achievements = Achievements::with(['category', 'createdBy', 'updatedBy', 'deletedBy'])->get();
+        return response()->json(AchievementResource::collection($achievements));
     }
 
     /**
@@ -23,21 +27,22 @@ class AchievementController extends Controller
     {
         $request->validate([
             'title' => 'required|string|max:255',
-            'contents' => 'required|string',
-            'image' => 'required|image|mimes:jpg,jpeg,png|max:2048'
+            'description' => 'required|string',
+            'image' => 'required|image|mimes:jpg,jpeg,png|max:2048',
+            'category_id' => 'required|integer'
         ]);
 
         $path = $request->file('image')->store('achievements_image', 'public');
 
         $achievement = Achievements::create([
             'title' => $request->title,
-            'slug' => $this->generateUniqueSlug($request->title),
-            'contents' => $request->contents,
-            'image' => $path
+            'description' => $request->description,
+            'image' => $path,
+            'category_id' => $request->category_id
         ]);
 
 
-        return response()->json($achievement, 201);
+        return response()->json( new AchievementResource($achievement), 201);
     }
 
     /**
@@ -45,49 +50,76 @@ class AchievementController extends Controller
      */
     public function show($slug)
     {
-        $achievement = Achievements::where('slug', $slug)->firstOrFail();
-
-        return response()->json($achievement);
+        
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $slug)
+    public function update(Request $request, $id)
     {
-        $achievement = Achievements::where('slug', $slug)->firstOrFail();
+        $achivement = Achievements::findOrFail($id);
 
-        $request->validate([
+        // Validasi input
+        $validated = $request->validate([
             'title' => 'sometimes|string|max:255',
-            'contents' => 'sometimes|string',
+            'description' => 'sometimes|string',
+            'image' => 'sometimes|image|mimes:jpg,jpeg,png|max:2048',
+            'category_id' => 'sometimes|integer'
         ]);
 
         $data = [];
 
         if ($request->filled('title')) {
-            $data['title'] = $request->title;
-            $data['slug'] = $this->generateUniqueSlug($request->title);
+            $data['title'] = $validated['title'];
         }
 
-        if ($request->filled('contents')) {
-            $data['contents'] = $request->contents;
+        if ($request->filled('description')) {
+            $data['description'] = $validated['description'];
         }
 
-        $achievement->update($data);
+        if ($request->filled('category_id')) {
+            $data['category_id'] = $validated['category_id'];
+        }
 
-        return response()->json($achievement->fresh(), 200);
+        // Jika ada gambar baru (opsional)
+        if ($request->hasFile('image')) {
+            // Hapus gambar lama (kalau ada)
+            if (!empty($achivement->image) && file_exists(public_path('achievements_image/' . $achivement->image))) {
+                unlink(public_path('achievements_image/' . $achivement->image));
+            }
+
+            // Simpan gambar baru
+            $path = $request->file('image')->store('achievements_image', 'public');
+
+            // Simpan path relatif ke kolom image
+            $data['image'] = $path;
+        }
+
+        // Update data di database
+        $achivement->update($data);
+
+        // Kembalikan data terbaru
+        return response()->json([
+            'message' => 'Achievement updated successfully',
+            'data' => new AchievementResource($achivement),
+        ], 200);
     }
 
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($slug)
+    public function destroy($id)
     {
-        $achievement = Achievements::where('slug', $slug)->firstOrFail();
+        $achievement = Achievements::findOrFail($id);
+        if ($achievement->image) {
+            // Jika menggunakan Storage facade (untuk file di storage/app/public)
+            Storage::disk('public')->delete($achievement->image);
+        }
         $achievement->delete();
 
-        return response()->json(["message" => "Delete successfully"]);
+        return response()->json(["message" => "Achievement deleted successfully"]);
     }
 
     function generateUniqueSlug($title)

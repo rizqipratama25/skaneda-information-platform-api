@@ -46,7 +46,7 @@ class ChatController extends Controller
         $data->update( $validate);
 
         return response()->json([
-            'message' => 'Berhasil update Chat',
+            'message' => 'Chat updated successfully',
             'data' => $data
         ]);
     }
@@ -60,7 +60,7 @@ class ChatController extends Controller
         $data->delete(); 
 
         return response()->json([
-            'message' => 'Chat berhasil dihapus'
+            'message' => 'Chat deleted successfully'
         ]);
     }
 }

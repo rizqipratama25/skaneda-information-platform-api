@@ -18,7 +18,7 @@ class ForumController extends Controller
     {
         $data = Cache::remember('forums', 300, function () {
             $forum = Forum::whereHas('status', function ($query) {
-                $query->where('status', 'Active');
+                $query->where('status', 'Active')->with(['status', 'chats']);
             })->get();
 
             return ForumResource::collection($forum)->resolve();
@@ -59,7 +59,7 @@ class ForumController extends Controller
             'status_id' => $request->status_id ?? $defaultStatusId
         ]);
 
-        return response()->json(['data' => $data]);
+        return response()->json(new ForumResource($data));
     }
 
     /**
@@ -89,7 +89,7 @@ class ForumController extends Controller
         $data->update($validate);
 
         return response()->json([
-            'message' => 'Berhasil update Forum',
+            'message' => 'Forum updated successfully',
             'data' => new ForumResource($data)
         ]);
     }
@@ -105,7 +105,7 @@ class ForumController extends Controller
         $data->delete(); // soft delete, tidak benar-benar hilang dari DB
 
         return response()->json([
-            'message' => 'Forum berhasil dihapus'
+            'message' => 'Forum deleted successfully'
         ]);
     }
 }

@@ -5,7 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class FacilityResource extends JsonResource
+class JobResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -17,10 +17,12 @@ class FacilityResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'status' => $this->status->status,
-            'images' => $this->images->map(function ($image) {
-                return ["id" => $image->id, "image" => $image->image];
-            })
+            'open_positions' => $this->open_positions,
+            'position' => $this->position,
+            'type' => $this->type->type,
+            'location' => $this->location,
+            'description' => $this->description,
+            'registration_link' => $this->registration_link,
         ];
     }
 }
