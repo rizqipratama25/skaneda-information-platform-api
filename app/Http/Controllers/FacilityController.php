@@ -18,7 +18,7 @@ class FacilityController extends Controller
     {
         $data = Cache::remember('facilities', 300, function () {
             $facilities = Facility::whereHas('status', function ($query) {
-                $query->where('status', 'Active')->with('status');
+                $query->where('status', 'Active')->with(['status', 'images']);
             })->get();
 
             return FacilityResource::collection($facilities)->resolve();

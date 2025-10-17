@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver;
 
 class NewsController extends Controller
 {
@@ -36,15 +38,19 @@ class NewsController extends Controller
             'image' => 'required|image|mimes:jpg,jpeg,png|max:2048'
         ]);
 
-        $path = $request->file('image')->store('news_images', 'public');
+        $manager = new ImageManager(new Driver());
+
+        $image = $manager->read($request->file('image'))->toWebp(quality: 85);
+        $filename = Str::uuid() . '.' . 'webp';
+
+        Storage::disk('public')->put('news_images/' . $filename, $image->toString());
 
         $news = News::create([
             'title' => $request->title,
             'slug' => $this->generateUniqueSlug($request->title),
             'contents' => $request->contents,
-            'image' => $path
+            'image' => 'news_images/' . $filename
         ]);
-
 
         return response()->json(new NewsResource($news), 201);
     }
@@ -107,10 +113,15 @@ class NewsController extends Controller
             }
 
             // Simpan gambar baru
-            $path = $request->file('image')->store('news_images', 'public');
+            $manager = new ImageManager(new Driver());
+
+            $image = $manager->read($request->file('image'))->toWebp(quality: 85);
+            $filename = Str::uuid() . '.' . 'webp';
+
+            Storage::disk('public')->put('news_images/' . $filename, $image->toString());
 
             // Simpan path relatif ke kolom image
-            $data['image'] = $path;
+            $data['image'] = 'news_images/' . $filename;
         }
 
         // Update data di database

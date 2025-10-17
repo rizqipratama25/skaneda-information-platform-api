@@ -8,6 +8,9 @@ use App\Models\Status;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver;
 
 class ExtracurricularController extends Controller
 {
@@ -18,7 +21,7 @@ class ExtracurricularController extends Controller
     {
         $data = Cache::remember('extracurricular', 300, function () {
             $extra = Extracurricular::whereHas('status', function ($query) {
-                $query->where('status', 'Active')->with('status');
+                $query->where('status', 'Active')->with(['status', 'images']);
             })->get();
 
             return ExtracurricularResource::collection($extra)->resolve();
@@ -49,13 +52,18 @@ class ExtracurricularController extends Controller
             'image' => 'required|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
-        $path = $request->file('image')->store('extracurricular_images', 'public');
+        $manager = new ImageManager(new Driver());
+
+        $image = $manager->read($request->file('image'))->toWebp(quality: 85);
+        $filename = Str::uuid() . '.' . 'webp';
+
+        Storage::disk('public')->put('extracurricular_images/' . $filename, $image->toString());
 
         $defaultStatusId = Status::firstOrCreate(['status' => 'Active'])->id;
 
         $data = Extracurricular::create([
             'name' => $request->name,
-            'image' => $path,
+            'image' => 'extracurricular_images/' . $filename,
             'status_id' => $request->status_id ?? $defaultStatusId
         ]);
 
@@ -75,6 +83,9 @@ class ExtracurricularController extends Controller
      */
     public function update(Request $request, $id)
     {
+        Cache::forget('extracurricular');
+        Cache::forget('extracurricular-admin');
+
         $ext = Extracurricular::findOrFail($id);
 
         // Validasi input
@@ -102,10 +113,15 @@ class ExtracurricularController extends Controller
             }
 
             // Simpan gambar baru
-            $path = $request->file('image')->store('extracurricular_images', 'public');
+            $manager = new ImageManager(new Driver());
+
+            $image = $manager->read($request->file('image'))->toWebp(quality: 85);
+            $filename = Str::uuid() . '.' . 'webp';
+
+            Storage::disk('public')->put('extracurricular_images/' . $filename, $image->toString());
 
             // Simpan path relatif ke kolom image
-            $data['image'] = $path;
+            $data['image'] = 'extracurricular_images/' . $filename;
         }
 
         // Update data di database
@@ -130,7 +146,7 @@ class ExtracurricularController extends Controller
             // Jika menggunakan Storage facade (untuk file di storage/app/public)
             Storage::disk('public')->delete($extracurricular->image);
         }
-        $extracurricular->delete(); 
+        $extracurricular->delete();
 
         return response()->json([
             'message' => 'Extracurricular deleted successfully'

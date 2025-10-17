@@ -8,6 +8,8 @@ use App\Models\Achievements;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver;
 
 class AchievementController extends Controller
 {
@@ -32,26 +34,28 @@ class AchievementController extends Controller
             'category_id' => 'required|integer'
         ]);
 
-        $path = $request->file('image')->store('achievements_image', 'public');
+        $manager = new ImageManager(new Driver());
+
+        $image = $manager->read($request->file('image'))->toWebp(quality: 85);
+        $filename = Str::uuid() . '.' . 'webp';
+
+        Storage::disk('public')->put('achievements_image/' . $filename, $image->toString());
 
         $achievement = Achievements::create([
             'title' => $request->title,
             'description' => $request->description,
-            'image' => $path,
+            'image' => 'achievements_image/' . $filename,
             'category_id' => $request->category_id
         ]);
 
 
-        return response()->json( new AchievementResource($achievement), 201);
+        return response()->json(new AchievementResource($achievement), 201);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show($slug)
-    {
-        
-    }
+    public function show($slug) {}
 
     /**
      * Update the specified resource in storage.
@@ -90,10 +94,15 @@ class AchievementController extends Controller
             }
 
             // Simpan gambar baru
-            $path = $request->file('image')->store('achievements_image', 'public');
+            $manager = new ImageManager(new Driver());
+
+            $image = $manager->read($request->file('image'))->toWebp(quality: 85);
+            $filename = Str::uuid() . '.' . 'webp';
+
+            Storage::disk('public')->put('achievements_image/' . $filename, $image->toString());
 
             // Simpan path relatif ke kolom image
-            $data['image'] = $path;
+            $data['image'] = 'achievements_image/' . $filename;
         }
 
         // Update data di database
