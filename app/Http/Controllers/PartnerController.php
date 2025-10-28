@@ -11,7 +11,7 @@ class PartnerController extends Controller
     public function index()
     {
         $data = Cache::remember('partners', 300, function () {
-            $partner = Partner::all();
+            $partner = Partner::paginate(10);
             return $partner;
         });
 

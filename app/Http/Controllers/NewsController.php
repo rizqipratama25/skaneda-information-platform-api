@@ -19,7 +19,7 @@ class NewsController extends Controller
     public function index()
     {
         $data = Cache::remember('news', 300, function () {
-            $news = News::with(['createdBy', 'updatedBy', 'deletedBy'])->get();
+            $news = News::with(['createdBy', 'updatedBy', 'deletedBy'])->paginate(10);
             return NewsResource::collection($news)->resolve();
         });
 

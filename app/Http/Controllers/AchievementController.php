@@ -18,7 +18,7 @@ class AchievementController extends Controller
      */
     public function index()
     {
-        $achievements = Achievements::with(['category', 'createdBy', 'updatedBy', 'deletedBy'])->get();
+        $achievements = Achievements::with(['category', 'createdBy', 'updatedBy', 'deletedBy'])->paginate(10);
         return response()->json(AchievementResource::collection($achievements));
     }
 

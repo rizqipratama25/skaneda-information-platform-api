@@ -11,7 +11,7 @@ class JobListingController extends Controller
 {
     public function index()
     {
-        $data = JobListing::all();
+        $data = JobListing::paginate(10);
         return response()->json(JobResource::collection($data));
     }
 
