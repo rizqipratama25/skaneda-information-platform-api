@@ -68,6 +68,8 @@ class FacilityController extends Controller
      */
     public function update(Request $request, $id)
     {
+        Cache::forget('facilities');
+        Cache::forget('facilities-admin');
         $facility = Facility::findOrFail($id);
 
         $validate = $request->validate([
