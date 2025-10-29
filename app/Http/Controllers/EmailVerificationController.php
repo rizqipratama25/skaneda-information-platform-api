@@ -23,7 +23,7 @@ class EmailVerificationController extends Controller
 
         $user = User::findOrFail($request->id);
 
-        if (! hash_equals($request->hash, sha1($user->getEmailForVerification()))) {
+        if (!hash_equals($request->hash, sha1($user->getEmailForVerification()))) {
             return response()->json(['message' => 'Invalid verification hash.'], 403);
         }
 
