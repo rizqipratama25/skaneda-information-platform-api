@@ -32,10 +32,6 @@ class AuthController extends Controller
             return response()->json(['message' => 'Email atau password salah']);
         }
 
-        if (is_null($user->email_verified_at)) {
-            return response()->json(['message' => 'Email belum diverifikasi'], 403);
-        }
-
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
