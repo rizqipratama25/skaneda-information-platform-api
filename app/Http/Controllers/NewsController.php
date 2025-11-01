@@ -151,6 +151,10 @@ class NewsController extends Controller
         return response()->json(["message" => "News deleted successfully"]);
     }
 
+    public function showFile($file) {
+        return response()->file(storage_path("app/public/$file"));
+    }
+
     function generateUniqueSlug($title)
     {
         $slug = Str::slug($title);
@@ -164,4 +168,6 @@ class NewsController extends Controller
 
         return $slug;
     }
+
+
 }

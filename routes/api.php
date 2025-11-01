@@ -132,3 +132,5 @@ Route::delete('/partner/{id}', [PartnerController::class, 'destroy'])->middlewar
 
 // News View
 Route::post('/news/{news}/view', [NewsViewController::class, 'store']);
+
+// Test view
