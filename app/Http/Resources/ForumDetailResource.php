@@ -21,7 +21,9 @@ class ForumDetailResource extends JsonResource
             "chats" => $this->chats->map(function ($chat) {
                 return [
                     "user_status" => $chat->user->role->name,
+                    "username" => $chat->user->username,
                     "chat" => $chat->chat,
+                    "status" => $chat->status->status
                 ];
             })
         ];

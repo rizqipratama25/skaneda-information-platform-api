@@ -14,11 +14,15 @@ class Forum extends Model
         'status_id'
     ];
 
-    public function status(): BelongsTo {
+    public function status(): BelongsTo
+    {
         return $this->belongsTo(Status::class);
     }
 
-    public function chats(): HasMany {
-        return $this->hasMany(Chat::class);
+    public function chats(): HasMany
+    {
+        return $this->hasMany(Chat::class)->whereHas('status', function ($q) {
+            $q->where('status', 'Active');
+        });
     }
 }
