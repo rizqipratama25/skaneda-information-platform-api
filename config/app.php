@@ -43,6 +43,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Frontend URL
+    |--------------------------------------------------------------------------
+    | This URL is used by the application to generate links to the frontend
+    | application, such as for email verification and password resets.
+    | Make sure to set this in your ".env" file.
+    |
+    */
+
+    'frontend_url' => env('APP_FRONTEND_URL'),
+
+
+    /*
+    |--------------------------------------------------------------------------
     | Application URL
     |--------------------------------------------------------------------------
     |

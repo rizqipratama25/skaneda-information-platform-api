@@ -2,8 +2,10 @@
 
 namespace App\Providers;
 
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -21,8 +23,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Gate::define('create-todo', function (User $user) {
-            return $user->role_id == 1;
+        Gate::define('admin', function (User $user) {
+            return $user->role_id == Role::firstWhere('name', 'admin')->id;
         });
+
+        URL::forceRootUrl(config('app.url'));
+        if (str_starts_with(config('app.url'), 'https://')) {
+            URL::forceScheme('https');                 
+        }
     }
 }

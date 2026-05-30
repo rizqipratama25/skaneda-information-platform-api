@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
+            $table->string('fullname');
             $table->string('username')->unique();
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
@@ -35,6 +36,21 @@ return new class extends Migration
             $table->longText('payload');
             $table->integer('last_activity')->index();
         });
+
+        Schema::create('statuses', function (Blueprint $table) {
+            $table->id();
+            $table->string('status');
+            $table->timestamps();
+        });
+
+        Schema::table('users', function (Blueprint $table) {
+            $table->foreignId('status_id')
+                ->after('password')
+                ->nullable()
+                ->constrained('statuses')
+                ->cascadeOnUpdate()
+                ->restrictOnDelete();
+        });
     }
 
     /**
@@ -45,5 +61,6 @@ return new class extends Migration
         Schema::dropIfExists('users');
         Schema::dropIfExists('password_reset_tokens');
         Schema::dropIfExists('sessions');
+        Schema::dropIfExists('user_statuses');
     }
 };

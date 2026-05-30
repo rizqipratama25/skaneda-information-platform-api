@@ -16,6 +16,10 @@ return new class extends Migration
             $table->string('name', 100);
             $table->timestamps();
         });
+
+        Schema::table('users', function (Blueprint $table) {
+            $table->foreignId('role_id')->after('status_id')->constrained('roles')->restrictOnDelete();
+        });
     }
 
     /**
